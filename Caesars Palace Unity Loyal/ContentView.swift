@@ -1096,13 +1096,14 @@ struct RewardScrollInfoCard: View {
             VStack(spacing: 8) {
                 Text(reward.title)
                     .font(.system(.headline, design: .serif, weight: .bold))
+                    .foregroundStyle(Color.white)
                     .multilineTextAlignment(.center)
                     .lineLimit(3)
                     .minimumScaleFactor(0.78)
 
                 Text(reward.description)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.white)
                     .multilineTextAlignment(.center)
                     .lineLimit(5)
                     .minimumScaleFactor(0.78)
@@ -1110,7 +1111,7 @@ struct RewardScrollInfoCard: View {
                 if showsExpiration {
                     Text("Expires \(reward.expirationDate.formatted(date: .abbreviated, time: .omitted))")
                         .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.white)
                         .multilineTextAlignment(.center)
                         .lineLimit(2)
                         .minimumScaleFactor(0.78)
