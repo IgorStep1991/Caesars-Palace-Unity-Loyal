@@ -640,6 +640,7 @@ struct LocalStorage {
     func save(_ snapshot: AppSnapshot) {
         guard let data = try? JSONEncoder().encode(snapshot) else { return }
         UserDefaults.standard.set(data, forKey: key)
+        UserDefaults.standard.synchronize()
     }
 }
 
@@ -993,12 +994,8 @@ struct ScrollsView: View {
         .background(AppSharedBackground())
         .sheet(item: $selectedReward) { reward in
             RewardDetailPanel(reward: currentReward(for: reward)) {
-                do {
-                    try store.activateReward(currentReward(for: reward))
-                    selectedReward = nil
-                } catch {
-                    alert = AlertPayload(message: error.localizedDescription)
-                }
+                try store.activateReward(currentReward(for: reward))
+                selectedReward = nil
             }
             .presentationDetents([.medium, .large])
         }
@@ -1028,7 +1025,8 @@ struct ClosedRewardScrollView: View {
 
 struct RewardDetailPanel: View {
     let reward: RewardScroll
-    let activate: () -> Void
+    let activate: () throws -> Void
+    @State private var alert: AlertPayload?
 
     var body: some View {
         ZStack {
@@ -1058,7 +1056,11 @@ struct RewardDetailPanel: View {
                 }
 
                 Button {
-                    activate()
+                    do {
+                        try activate()
+                    } catch {
+                        alert = AlertPayload(message: error.localizedDescription)
+                    }
                 } label: {
                     Text(reward.status == .activated ? "Activated" : "Activate")
                         .frame(maxWidth: .infinity)
@@ -1069,6 +1071,9 @@ struct RewardDetailPanel: View {
             }
             .padding()
             .padding(.top, 20)
+        }
+        .alert(item: $alert) { payload in
+            Alert(title: Text("Activation"), message: Text(payload.message), dismissButton: .default(Text("OK")))
         }
     }
 }
